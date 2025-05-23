@@ -2,23 +2,30 @@ class Circle {
   constructor(x, y, dx, dy, radius) {
     this.position = createVector(x, y);
     this.velocity = createVector(dx, dy);
+    this.acceleration = createVector(0, 0);
     this.r = radius;
     this.c = color(random(255), random(255), random(255));
   }
 
+  applyForce(force) {
+    this.acceleration.add(force);
+  }
+
   update() {
     this.applyGravity();
-    this.move();
+
+    this.velocity.add(this.acceleration);
+    this.position.add(this.velocity);
+
+    this.acceleration.mult(0);
+
     this.bounceEdges();
     this.draw();
   }
 
   applyGravity() {
-    this.velocity.y += 0.1;  // gravity affects y-velocity
-  }
-
-  move() {
-    this.position.add(this.velocity);
+    let gravity = createVector(0, 0.1);
+    this.applyForce(gravity);
   }
 
   bounceEdges() {
