@@ -14,9 +14,12 @@ class Circle {
   update() {
     this.applyGravity();
 
+    // Update velocity by acceleration
     this.velocity.add(this.acceleration);
+    // Update position by velocity
     this.position.add(this.velocity);
 
+    // Reset acceleration for next frame
     this.acceleration.mult(0);
 
     this.bounceEdges();
@@ -48,21 +51,10 @@ class Circle {
   }
 
   checkCollision(other) {
-    let diff = p5.Vector.sub(other.position, this.position);
-    let dist = diff.mag();
-    let minDist = this.r + other.r;
-
-    if (dist < minDist) {
-      let angle = diff.heading();
-      let target = p5.Vector.add(this.position, p5.Vector.fromAngle(angle).mult(minDist));
-      let ax = (target.x - other.position.x) * 0.05;
-      let ay = (target.y - other.position.y) * 0.05;
-
-      this.velocity.x -= ax;
-      this.velocity.y -= ay;
-      other.velocity.x += ax;
-      other.velocity.y += ay;
-    }
+     let diff = p5.Vector.sub(other.position, this.position)
+  let dist = diff.mag()
+  let minDist = this.r + other.r
+  return dist < minDist
   }
 
   draw() {
