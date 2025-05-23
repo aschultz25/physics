@@ -7,19 +7,12 @@ class Circle {
     this.c = color(random(255), random(255), random(255));
   }
 
-  applyForce(force) {
-    this.acceleration.add(force);
-  }
-
   update() {
     this.applyGravity();
+    this.repelFromMouse();
 
-    // Update velocity by acceleration
     this.velocity.add(this.acceleration);
-    // Update position by velocity
     this.position.add(this.velocity);
-
-    // Reset acceleration for next frame
     this.acceleration.mult(0);
 
     this.bounceEdges();
@@ -27,8 +20,25 @@ class Circle {
   }
 
   applyGravity() {
-    let gravity = createVector(0, 0.1);
-    this.applyForce(gravity);
+    this.applyForce(createVector(0, 0.1));
+  }
+
+  applyForce(force) {
+    this.acceleration.add(force);
+  }
+
+  repelFromMouse() {
+    let mouse = createVector(mouseX, mouseY);
+    let dir = p5.Vector.sub(this.position, mouse);
+    let distance = dir.mag();
+    let minDist = 50;
+
+    if (distance < minDist) {
+      dir.normalize();
+      let strength = (minDist - distance) / minDist;
+      dir.mult(strength * 0.5);
+      this.applyForce(dir);
+    }
   }
 
   bounceEdges() {
@@ -51,14 +61,25 @@ class Circle {
   }
 
   checkCollision(other) {
-     let diff = p5.Vector.sub(other.position, this.position)
-  let dist = diff.mag()
-  let minDist = this.r + other.r
-  return dist < minDist
+    let d = p5.Vector.dist(this.position, other.position);
+    return d < this.r + other.r;
+  }
+
+  burst() {
+    let newCircles = [];
+    for (let i = 0; i < 3; i++) {
+      let angle = random(TWO_PI);
+      let speed = random(1, 3);
+      let dx = cos(angle) * speed;
+      let dy = sin(angle) * speed;
+      newCircles.push(new Circle(this.position.x, this.position.y, dx, dy, this.r / 2));
+    }
+    return newCircles;
   }
 
   draw() {
     fill(this.c);
-    circle(this.position.x, this.position.y, this.r);
+    noStroke();
+    circle(this.position.x, this.position.y, this.r * 2);
   }
 }
