@@ -11,8 +11,17 @@ function setup() {
 
 function draw() {
   background(220);
+
+  // First update all positions
   for (let circle of movers) {
     circle.update();
+  }
+
+  // Then check collisions between each pair
+  for (let i = 0; i < movers.length; i++) {
+    for (let j = i + 1; j < movers.length; j++) {
+      movers[i].checkCollision(movers[j]);
+    }
   }
 }
 
@@ -58,6 +67,27 @@ class Circle {
     if (this.y > height - this.r) {
       this.y = height - this.r;
       this.dy *= -1;
+    }
+  }
+
+  checkCollision(other) {
+    let dx = other.x - this.x;
+    let dy = other.y - this.y;
+    let dist = sqrt(dx * dx + dy * dy);
+    let minDist = this.r + other.r;
+
+    if (dist < minDist) {
+      // Normalize direction
+      let angle = atan2(dy, dx);
+      let targetX = this.x + cos(angle) * minDist;
+      let targetY = this.y + sin(angle) * minDist;
+      let ax = (targetX - other.x) * 0.05;
+      let ay = (targetY - other.y) * 0.05;
+
+      this.dx -= ax;
+      this.dy -= ay;
+      other.dx += ax;
+      other.dy += ay;
     }
   }
 
